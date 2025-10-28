@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "cd frontend && npm install && npm run build && cd .. && npm install --prefix backend",
+    "build": "npm run build:frontend && npm run install:backend",
+    "build:frontend": "cd frontend && npm install && npm run build",
+    "install:backend": "cd backend && npm install",
     "start": "node backend/server.js",
     "dev": "concurrently \"cd frontend && npm run dev\" \"cd backend && npm run dev\""
   },
