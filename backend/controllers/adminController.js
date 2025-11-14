@@ -1,22 +1,16 @@
 
-const jwt = require('jsonwebtoken');
+const Admin = require('../models/AdminModel.js');
+const generateToken = require('../utils/generateToken.js');
+
+// Import all models to fetch data for dashboard
+const Product = require('../models/ProductModel.js');
+const User = require('../models/UserModel.js');
+const Testimonial = require('../models/TestimonialModel.js');
+const Occasion = require('../models/OccasionModel.js');
+const PaperType = require('../models/PaperTypeModel.js');
+// Mock data for things not yet in DB
 const db = require('../models/index.js');
 
-// Mock Admin User
-const MOCK_ADMIN = {
-    _id: '60d5ec49a9b8b84b8c8e8b8b', // Static ID for JWT
-    email: 'admin@loveunsent.com',
-    name: 'Admin User',
-    password: 'admin' // Using plain text for this mock setup
-};
-
-// Generate JWT
-const generateToken = (id) => {
-  const secret = process.env.JWT_SECRET || 'a_very_strong_fallback_secret_for_development_env';
-  return jwt.sign({ id }, secret, {
-    expiresIn: '1d',
-  });
-};
 
 // @desc    Auth admin & get token
 // @route   POST /api/admin/login
@@ -29,16 +23,14 @@ const loginAdmin = async (req, res) => {
   }
 
   try {
-    // Robustly check credentials by casting to string before trimming
-    const submittedEmail = String(email || '').trim().toLowerCase();
-    const submittedPassword = String(password || '').trim();
+    const admin = await Admin.findOne({ email });
 
-    if (submittedEmail === MOCK_ADMIN.email && submittedPassword === MOCK_ADMIN.password) {
+    if (admin && (await admin.matchPassword(password))) {
       res.json({
-        _id: MOCK_ADMIN._id,
-        name: MOCK_ADMIN.name,
-        email: MOCK_ADMIN.email,
-        token: generateToken(MOCK_ADMIN._id),
+        _id: admin._id,
+        name: admin.name,
+        email: admin.email,
+        token: generateToken(admin._id),
       });
     } else {
       res.status(401).json({ message: 'Invalid email or password' });
@@ -54,36 +46,55 @@ const loginAdmin = async (req, res) => {
 // @route   GET /api/admin/dashboard-data
 // @access  Private/Admin
 const getDashboardData = async (req, res) => {
-    // In a real app, this data would be fetched from the database.
-    // For now, we use the mock data.
-    const taxSettings = { rate: 18, included: false };
-    const storeSettings = {
-        storeName: "Love Unsent",
-        address: "123, Calligraphy Lane, Artsy City, 400001, IN",
-        gstin: "27AAAAA0000A1Z5",
-        contactEmail: "contact@loveunsent.in",
-        shipping: { flatRate: 0, freeShippingThreshold: 0 }
-    };
-    const transactions = []; // Mocked as empty for now
+    try {
+        const products = await Product.find({});
+        const customers = await User.find({ isAdmin: false });
+        const testimonials = await Testimonial.find({});
+        const occasions = await Occasion.find({});
+        const paperTypes = await PaperType.find({});
+        
+        // Mocked data that can be moved to DB later
+        const taxSettings = { rate: 18, included: false };
+        const storeSettings = {
+            storeName: "Love Unsent",
+            address: "123, Calligraphy Lane, Artsy City, 400001, IN",
+            gstin: "27AAAAA0000A1Z5",
+            contactEmail: "contact@loveunsent.in",
+            shipping: { flatRate: 0, freeShippingThreshold: 0 }
+        };
+        const transactions = [];
+        const writers = db.writers;
+        const coupons = db.coupons;
+        const shipments = db.shipments;
+        const paymentMethods = db.paymentMethods;
+        const shippingZones = db.shippingZones;
+        const shippingRates = db.shippingRates;
+        const serviceablePincodes = db.serviceablePincodes;
+        const orders = db.orders;
 
-    res.json({
-        orders: db.orders,
-        products: db.products,
-        customers: db.customers,
-        transactions,
-        paymentMethods: db.paymentMethods,
-        taxSettings,
-        shipments: db.shipments,
-        coupons: db.coupons,
-        storeSettings,
-        writers: db.writers,
-        testimonials: db.testimonials,
-        shippingZones: db.shippingZones,
-        shippingRates: db.shippingRates,
-        serviceablePincodes: db.serviceablePincodes,
-        occasions: db.occasions,
-        paperTypes: db.paperTypes,
-    });
+
+        res.json({
+            products,
+            customers,
+            testimonials,
+            occasions,
+            paperTypes,
+            orders,
+            transactions,
+            paymentMethods,
+            taxSettings,
+            shipments,
+            coupons,
+            storeSettings,
+            writers,
+            shippingZones,
+            shippingRates,
+            serviceablePincodes,
+        });
+    } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        res.status(500).json({ message: 'Failed to fetch dashboard data' });
+    }
 };
 
 

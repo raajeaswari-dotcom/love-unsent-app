@@ -1,54 +1,64 @@
-const db = require('../models/index.js');
 
-const getAllOccasions = (req, res) => {
-  res.json(db.occasions);
+const Occasion = require('../models/OccasionModel.js');
+
+const getAllOccasions = async (req, res) => {
+  try {
+    const occasions = await Occasion.find({});
+    res.json(occasions);
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error' });
+  }
 };
 
-const createOccasion = (req, res) => {
+const createOccasion = async (req, res) => {
   const { name, category, description } = req.body;
   if (!name || !category || !description) {
     return res.status(400).json({ message: 'Name, category, and description are required.' });
   }
-  const newOccasion = {
-    id: db.occasions.length > 0 ? Math.max(...db.occasions.map(o => o.id)) + 1 : 1,
-    name,
-    category,
-    description,
-  };
-  db.occasions.push(newOccasion);
-  res.status(201).json(newOccasion);
+  
+  try {
+    const occasion = new Occasion({ name, category, description });
+    const createdOccasion = await occasion.save();
+    res.status(201).json(createdOccasion);
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error' });
+  }
 };
 
-const updateOccasion = (req, res) => {
-  const { id } = req.params;
+const updateOccasion = async (req, res) => {
   const { name, category, description } = req.body;
-  const occasionIndex = db.occasions.findIndex(o => o.id === parseInt(id));
-
-  if (occasionIndex === -1) {
-    return res.status(404).json({ message: 'Occasion not found.' });
-  }
   
-  if (!name || !category || !description) {
-    return res.status(400).json({ message: 'Name, category, and description are required.' });
-  }
+  try {
+    const occasion = await Occasion.findById(req.params.id);
 
-  const updatedOccasion = { ...db.occasions[occasionIndex], name, category, description };
-  db.occasions[occasionIndex] = updatedOccasion;
-  
-  res.json(updatedOccasion);
+    if (occasion) {
+      occasion.name = name || occasion.name;
+      occasion.category = category || occasion.category;
+      occasion.description = description || occasion.description;
+
+      const updatedOccasion = await occasion.save();
+      res.json(updatedOccasion);
+    } else {
+      res.status(404).json({ message: 'Occasion not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error' });
+  }
 };
 
-const deleteOccasion = (req, res) => {
-  const { id } = req.params;
-  const occasionIndex = db.occasions.findIndex(o => o.id === parseInt(id));
+const deleteOccasion = async (req, res) => {
+  try {
+    const occasion = await Occasion.findById(req.params.id);
 
-  if (occasionIndex === -1) {
-    return res.status(404).json({ message: 'Occasion not found.' });
+    if (occasion) {
+      await occasion.deleteOne();
+      res.json({ message: 'Occasion removed' });
+    } else {
+      res.status(404).json({ message: 'Occasion not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error' });
   }
-
-  db.occasions.splice(occasionIndex, 1);
-
-  res.status(200).json({ message: 'Occasion deleted successfully.' });
 };
 
 module.exports = {

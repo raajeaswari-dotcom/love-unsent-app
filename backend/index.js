@@ -1,6 +1,14 @@
 
 const express = require('express');
 const cors = require('cors');
+const dotenv = require('dotenv');
+const connectDB = require('./config/db.js');
+
+// Load env vars
+dotenv.config();
+
+// Connect to database
+connectDB();
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -18,9 +26,8 @@ const shippingRoutes = require('./routes/shipping.js');
 const occasionsRoutes = require('./routes/occasions.js');
 const paperTypesRoutes = require('./routes/paperTypes.js');
 
-// More explicit CORS configuration to handle preflight requests for methods like POST
 const corsOptions = {
-  origin: '*', // Allow all origins for development
+  origin: '*',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   preflightContinue: false,
   optionsSuccessStatus: 204,
@@ -28,11 +35,11 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Enable pre-flight across-the-board.
+app.options('*', cors(corsOptions));
 
 app.use(express.json());
 
-// Use routes
+// Mount routers
 app.use('/api/products', productsRoutes);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/users', usersRoutes);
@@ -45,39 +52,12 @@ app.use('/api/shipping', shippingRoutes);
 app.use('/api/occasions', occasionsRoutes);
 app.use('/api/papertypes', paperTypesRoutes);
 
-// In-memory store for newsletter subscriptions
-const subscriptions = new Set();
-
-// Newsletter Subscription Endpoint
-app.post('/api/newsletter/subscribe', (req, res) => {
-    const { email } = req.body;
-    
-    // Basic validation
-    if (!email || typeof email !== 'string') {
-        return res.status(400).json({ message: 'Email is required.' });
-    }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        return res.status(400).json({ message: 'Please enter a valid email address.' });
-    }
-    
-    if (subscriptions.has(email)) {
-        return res.status(409).json({ message: 'This email is already subscribed.' });
-    }
-
-    subscriptions.add(email);
-    console.log('New subscription added:', email);
-    console.log('Total subscriptions:', subscriptions.size);
-    
-    res.status(201).json({ message: 'Thank you for subscribing!' });
-});
-
 
 // A simple health check endpoint
 app.get('/', (req, res) => {
-  res.send('Server is running!');
+  res.send('Server is running and connected to the database!');
 });
 
 app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
+  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${port}`);
 });

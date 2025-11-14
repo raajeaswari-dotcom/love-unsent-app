@@ -1,55 +1,64 @@
 
-const db = require('../models/index.js');
+const PaperType = require('../models/PaperTypeModel.js');
 
-const getAllPaperTypes = (req, res) => {
-  res.json(db.paperTypes);
+const getAllPaperTypes = async (req, res) => {
+  try {
+    const paperTypes = await PaperType.find({});
+    res.json(paperTypes);
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error' });
+  }
 };
 
-const createPaperType = (req, res) => {
+const createPaperType = async (req, res) => {
   const { name, description, imageUrl } = req.body;
   if (!name || !description || !imageUrl) {
     return res.status(400).json({ message: 'Name, description, and imageUrl are required.' });
   }
-  const newPaperType = {
-    id: db.paperTypes.length > 0 ? Math.max(...db.paperTypes.map(p => p.id)) + 1 : 1,
-    name,
-    description,
-    imageUrl,
-  };
-  db.paperTypes.push(newPaperType);
-  res.status(201).json(newPaperType);
+
+  try {
+    const paperType = new PaperType({ name, description, imageUrl });
+    const createdPaperType = await paperType.save();
+    res.status(201).json(createdPaperType);
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error' });
+  }
 };
 
-const updatePaperType = (req, res) => {
-  const { id } = req.params;
+const updatePaperType = async (req, res) => {
   const { name, description, imageUrl } = req.body;
-  const paperTypeIndex = db.paperTypes.findIndex(p => p.id === parseInt(id));
 
-  if (paperTypeIndex === -1) {
-    return res.status(404).json({ message: 'Paper type not found.' });
-  }
-  
-  if (!name || !description || !imageUrl) {
-    return res.status(400).json({ message: 'Name, description, and imageUrl are required.' });
-  }
+  try {
+    const paperType = await PaperType.findById(req.params.id);
 
-  const updatedPaperType = { ...db.paperTypes[paperTypeIndex], name, description, imageUrl };
-  db.paperTypes[paperTypeIndex] = updatedPaperType;
-  
-  res.json(updatedPaperType);
+    if (paperType) {
+      paperType.name = name || paperType.name;
+      paperType.description = description || paperType.description;
+      paperType.imageUrl = imageUrl || paperType.imageUrl;
+      
+      const updatedPaperType = await paperType.save();
+      res.json(updatedPaperType);
+    } else {
+      res.status(404).json({ message: 'Paper type not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error' });
+  }
 };
 
-const deletePaperType = (req, res) => {
-  const { id } = req.params;
-  const paperTypeIndex = db.paperTypes.findIndex(p => p.id === parseInt(id));
+const deletePaperType = async (req, res) => {
+  try {
+    const paperType = await PaperType.findById(req.params.id);
 
-  if (paperTypeIndex === -1) {
-    return res.status(404).json({ message: 'Paper type not found.' });
+    if (paperType) {
+      await paperType.deleteOne();
+      res.json({ message: 'Paper type removed' });
+    } else {
+      res.status(404).json({ message: 'Paper type not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error' });
   }
-
-  db.paperTypes.splice(paperTypeIndex, 1);
-
-  res.status(200).json({ message: 'Paper type deleted successfully.' });
 };
 
 module.exports = {
