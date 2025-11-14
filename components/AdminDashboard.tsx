@@ -79,7 +79,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ occasions, setOccasions
             setIsLoading(true);
             setError('');
             try {
-                const res = await fetch('http://localhost:3001/api/admin/dashboard-data', {
+                const res = await fetch('https://love-unsent-app-final-backend.onrender.com/api/admin/dashboard-data', {
                     headers: getAdminAuthHeader(),
                 });
                 if (!res.ok) {
@@ -189,7 +189,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ occasions, setOccasions
     
     const handleSaveTestimonial = async (testimonial: Testimonial) => {
         const method = testimonial.id ? 'PUT' : 'POST';
-        const url = `http://localhost:3001/api/testimonials${testimonial.id ? `/${testimonial.id}` : ''}`;
+        const url = `https://love-unsent-app-final-backend.onrender.com/api/testimonials${testimonial.id ? `/${testimonial.id}` : ''}`;
+
         
         try {
             const res = await fetch(url, {
@@ -213,7 +214,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ occasions, setOccasions
     const handleDeleteTestimonial = async (id: number) => {
         if (window.confirm('Are you sure you want to delete this testimonial?')) {
             try {
-                const res = await fetch(`http://localhost:3001/api/testimonials/${id}`, {
+                const res = await fetch(`https://love-unsent-app-final-backend.onrender.com/api/testimonials/${id}`, {
+
                     method: 'DELETE',
                     headers: getAdminAuthHeader(),
                 });
@@ -227,7 +229,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ occasions, setOccasions
 
     const handleSaveOccasion = async (occasion: Omit<Occasion, 'id'> & { id?: number }) => {
         const method = occasion.id ? 'PUT' : 'POST';
-        const url = `http://localhost:3001/api/occasions${occasion.id ? `/${occasion.id}` : ''}`;
+        const url = `https://love-unsent-app-final-backend.onrender.com/api/occasions${occasion.id ? `/${occasion.id}` : ''}`;
+
         
         try {
             const res = await fetch(url, {
@@ -251,7 +254,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ occasions, setOccasions
     const handleDeleteOccasion = async (id: number) => {
         if (window.confirm('Are you sure you want to delete this occasion?')) {
             try {
-                const res = await fetch(`http://localhost:3001/api/occasions/${id}`, {
+                const res = await fetch(`https://love-unsent-app-final-backend.onrender.com/api/occasions/${id}`, {
+
                     method: 'DELETE',
                     headers: getAdminAuthHeader(),
                 });
@@ -265,7 +269,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ occasions, setOccasions
     
     const handleSavePaperType = async (paperType: Omit<PaperType, 'id'> & { id?: number }) => {
         const method = paperType.id ? 'PUT' : 'POST';
-        const url = `http://localhost:3001/api/papertypes${paperType.id ? `/${paperType.id}` : ''}`;
+        const url = `https://love-unsent-app-final-backend.onrender.com/api/papertypes${paperType.id ? `/${paperType.id}` : ''}`;
+
         try {
             const res = await fetch(url, {
                 method,
@@ -289,7 +294,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ occasions, setOccasions
     const handleDeletePaperType = async (id: number) => {
         if (window.confirm('Are you sure you want to delete this paper type?')) {
             try {
-                const res = await fetch(`http://localhost:3001/api/papertypes/${id}`, {
+                const res = await fetch(`https://love-unsent-app-final-backend.onrender.com/api/papertypes/${id}`, {
+
                     method: 'DELETE',
                     headers: getAdminAuthHeader(),
                 });

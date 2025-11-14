@@ -18,7 +18,7 @@ const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onLoginSuccess }) => {
         setIsLoading(true);
 
         try {
-            const response = await fetch('http://localhost:3001/api/admin/login', {
+            const response = await fetch('https://love-unsent-app-final-backend.onrender.com/api/admin/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),

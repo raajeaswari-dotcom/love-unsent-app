@@ -33,7 +33,8 @@ const Newsletter: React.FC = () => {
     }
 
     try {
-        const response = await fetch('http://localhost:3001/api/newsletter/subscribe', {
+        const response = await fetch('https://love-unsent-app-final-backend.onrender.com/api/newsletter/subscribe', {
+
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email }),

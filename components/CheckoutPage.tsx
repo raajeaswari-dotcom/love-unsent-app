@@ -95,7 +95,8 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigate, cart, finalizeOrd
         setIsCheckingPincode(true);
         setPincodeMessage('');
         try {
-            const res = await fetch(`http://localhost:3001/api/shipping/check/${formState.zip}`);
+            const res = await fetch(`https://love-unsent-app-final-backend.onrender.com/api/shipping/check/${formState.zip}`);
+
             const data = await res.json();
             if (res.ok && data.serviceable) {
                 setPincodeStatus('checked');
@@ -184,7 +185,8 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ navigate, cart, finalizeOrd
         };
 
         try {
-            const res = await fetch('http://localhost:3001/api/orders', {
+            const res = await fetch('https://love-unsent-app-final-backend.onrender.com/api/orders', {
+
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(orderPayload),
