@@ -218,7 +218,8 @@ const App: React.FC = () => {
   const [paperTypes, setPaperTypes] = useState<PaperType[]>([]);
   
   useEffect(() => {
-    const API_BASE_URL = 'http://localhost:3001/api';
+    const API_BASE_URL = 'https://love-unsent-app-final-backend.onrender.com/api';
+
 
     const fetchPublicData = async () => {
         try {
