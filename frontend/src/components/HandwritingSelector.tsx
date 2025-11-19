@@ -1,1 +1,0 @@
-// This file has been identified as a duplicate or unused file and has been cleared to prevent build errors and confusion. The correct and active version of this code is located in the root 'components' directory.
