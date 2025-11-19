@@ -4,7 +4,8 @@ const Admin = require('./models/AdminModel.js');
 
 dotenv.config();
 
-mongoose.connect(process.env.MONGO_URI)
+mongoose
+  .connect(process.env.MONGO_URI)
   .then(async () => {
     console.log("Connected to MongoDB");
 
@@ -18,7 +19,7 @@ mongoose.connect(process.env.MONGO_URI)
     const admin = new Admin({
       name: "Main Admin",
       email: "admin@loveunsent.com",
-      password: "LoveUnsent@2025",  // <<< CHANGE THIS IF YOU WANT
+      password: "LoveUnsent@2025",
     });
 
     await admin.save();
@@ -26,9 +27,10 @@ mongoose.connect(process.env.MONGO_URI)
     console.log("Admin created successfully!");
     console.log("Email: admin@loveunsent.com");
     console.log("Password: LoveUnsent@2025");
+
     process.exit(0);
   })
-  .catch(err => {
+  .catch((err) => {
     console.error("Error:", err);
     process.exit(1);
   });

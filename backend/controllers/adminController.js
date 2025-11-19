@@ -1,20 +1,19 @@
-
 const Admin = require('../models/AdminModel.js');
 const generateToken = require('../utils/generateToken.js');
 
-// Import all models to fetch data for dashboard
+// Import Models
 const Product = require('../models/ProductModel.js');
 const User = require('../models/UserModel.js');
 const Testimonial = require('../models/TestimonialModel.js');
 const Occasion = require('../models/OccasionModel.js');
 const PaperType = require('../models/PaperTypeModel.js');
-// Mock data for things not yet in DB
+
+// Mock DB
 const db = require('../models/index.js');
 
-
-// @desc    Auth admin & get token
-// @route   POST /api/admin/login
-// @access  Public
+// -------------------------
+// LOGIN ADMIN
+// -------------------------
 const loginAdmin = async (req, res) => {
   const { email, password } = req.body;
 
@@ -26,79 +25,67 @@ const loginAdmin = async (req, res) => {
     const admin = await Admin.findOne({ email });
 
     if (admin && (await admin.matchPassword(password))) {
-      res.json({
+      return res.json({
         _id: admin._id,
         name: admin.name,
         email: admin.email,
         token: generateToken(admin._id),
       });
     } else {
-      res.status(401).json({ message: 'Invalid email or password' });
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
   } catch (error) {
     console.error('Admin login error:', error);
-    res.status(500).json({ message: 'Server error during login' });
+    return res.status(500).json({ message: 'Server error during login' });
   }
 };
 
-
-// @desc    Get all data for admin dashboard
-// @route   GET /api/admin/dashboard-data
-// @access  Private/Admin
+// -------------------------
+// DASHBOARD DATA
+// -------------------------
 const getDashboardData = async (req, res) => {
-    try {
-        const products = await Product.find({});
-        const customers = await User.find({ isAdmin: false });
-        const testimonials = await Testimonial.find({});
-        const occasions = await Occasion.find({});
-        const paperTypes = await PaperType.find({});
-        
-        // Mocked data that can be moved to DB later
-        const taxSettings = { rate: 18, included: false };
-        const storeSettings = {
-            storeName: "Love Unsent",
-            address: "123, Calligraphy Lane, Artsy City, 400001, IN",
-            gstin: "27AAAAA0000A1Z5",
-            contactEmail: "contact@loveunsent.in",
-            shipping: { flatRate: 0, freeShippingThreshold: 0 }
-        };
-        const transactions = [];
-        const writers = db.writers;
-        const coupons = db.coupons;
-        const shipments = db.shipments;
-        const paymentMethods = db.paymentMethods;
-        const shippingZones = db.shippingZones;
-        const shippingRates = db.shippingRates;
-        const serviceablePincodes = db.serviceablePincodes;
-        const orders = db.orders;
+  try {
+    const products = await Product.find({});
+    const customers = await User.find({ isAdmin: false });
+    const testimonials = await Testimonial.find({});
+    const occasions = await Occasion.find({});
+    const paperTypes = await PaperType.find({});
 
+    // Mock data
+    const taxSettings = { rate: 18, included: false };
+    const storeSettings = {
+      storeName: "Love Unsent",
+      address: "123, Calligraphy Lane, Artsy City, 400001, IN",
+      gstin: "27AAAAA0000A1Z5",
+      contactEmail: "contact@loveunsent.in",
+      shipping: { flatRate: 0, freeShippingThreshold: 0 },
+    };
 
-        res.json({
-            products,
-            customers,
-            testimonials,
-            occasions,
-            paperTypes,
-            orders,
-            transactions,
-            paymentMethods,
-            taxSettings,
-            shipments,
-            coupons,
-            storeSettings,
-            writers,
-            shippingZones,
-            shippingRates,
-            serviceablePincodes,
-        });
-    } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-        res.status(500).json({ message: 'Failed to fetch dashboard data' });
-    }
+    res.json({
+      products,
+      customers,
+      testimonials,
+      occasions,
+      paperTypes,
+      orders: db.orders,
+      transactions: [],
+      paymentMethods: db.paymentMethods,
+      taxSettings,
+      shipments: db.shipments,
+      coupons: db.coupons,
+      storeSettings,
+      writers: db.writers,
+      shippingZones: db.shippingZones,
+      shippingRates: db.shippingRates,
+      serviceablePincodes: db.serviceablePincodes,
+    });
+  } catch (error) {
+    console.error('Error fetching dashboard data:', error);
+    res.status(500).json({ message: 'Failed to fetch dashboard data' });
+  }
 };
 
-
-module.exports = { 
-    loginAdmin,
-    getDashboardData,
+module.exports = {
+  loginAdmin,
+  getDashboardData,
 };
