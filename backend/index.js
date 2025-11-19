@@ -6,13 +6,13 @@ const connectDB = require('./config/db.js');
 // Load env vars
 dotenv.config();
 
-// Connect to database
+// Connect to MongoDB
 connectDB();
 
 const app = express();
 
-// IMPORTANT for Render – MUST USE process.env.PORT ONLY
-const port = process.env.PORT;
+// IMPORTANT: Render MUST control the port
+const port = process.env.PORT || 3001;
 
 // CORS config
 app.use(cors({
@@ -20,12 +20,10 @@ app.use(cors({
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   allowedHeaders: 'Content-Type,Authorization',
 }));
-app.options('*', cors());
 
-// Body parser
 app.use(express.json());
 
-// Import routes
+// Routes
 app.use('/api/products', require('./routes/products.js'));
 app.use('/api/orders', require('./routes/orders.js'));
 app.use('/api/users', require('./routes/users.js'));
@@ -40,10 +38,9 @@ app.use('/api/papertypes', require('./routes/paperTypes.js'));
 
 // Health check
 app.get('/', (req, res) => {
-  res.send('Server is running!');
+  res.send('Server is running and connected to the database!');
 });
 
-// Start server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
