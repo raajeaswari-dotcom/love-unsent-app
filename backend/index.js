@@ -11,21 +11,19 @@ connectDB();
 
 const app = express();
 
-// IMPORTANT: Render requires EXACTLY this:
+// IMPORTANT FOR RENDER: must use EXACT PORT from environment, no fallback.
 const port = process.env.PORT;
 
-// CORS config
+// CORS
 app.use(cors({
   origin: '*',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   allowedHeaders: 'Content-Type,Authorization',
 }));
-app.options('*', cors());
 
-// Body parser
-app.use(express.json());
+app.use(express.json()); // body parser
 
-// Import routes
+// ROUTES
 app.use('/api/products', require('./routes/products.js'));
 app.use('/api/orders', require('./routes/orders.js'));
 app.use('/api/users', require('./routes/users.js'));
@@ -38,12 +36,12 @@ app.use('/api/shipping', require('./routes/shipping.js'));
 app.use('/api/occasions', require('./routes/occasions.js'));
 app.use('/api/papertypes', require('./routes/paperTypes.js'));
 
-// Health check
+// HEALTH CHECK
 app.get('/', (req, res) => {
   res.send('Server is running and connected to the database!');
 });
 
-// Start server
+// START SERVER
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
