@@ -1,4 +1,3 @@
-
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
@@ -11,7 +10,18 @@ dotenv.config();
 connectDB();
 
 const app = express();
+
+// ⚠️ IMPORTANT FOR RENDER — use dynamic port
 const port = process.env.PORT || 3001;
+
+// Wide-open CORS (for testing) 
+app.use(cors({
+  origin: '*',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
+app.use(express.json());
 
 // Import routes
 const productsRoutes = require('./routes/products.js');
@@ -26,19 +36,6 @@ const shippingRoutes = require('./routes/shipping.js');
 const occasionsRoutes = require('./routes/occasions.js');
 const paperTypesRoutes = require('./routes/paperTypes.js');
 
-const corsOptions = {
-  origin: '*',
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  preflightContinue: false,
-  optionsSuccessStatus: 204,
-  allowedHeaders: 'Content-Type,Authorization',
-};
-
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
-
-app.use(express.json());
-
 // Mount routers
 app.use('/api/products', productsRoutes);
 app.use('/api/orders', ordersRoutes);
@@ -52,12 +49,12 @@ app.use('/api/shipping', shippingRoutes);
 app.use('/api/occasions', occasionsRoutes);
 app.use('/api/papertypes', paperTypesRoutes);
 
-
-// A simple health check endpoint
+// Health check route
 app.get('/', (req, res) => {
-  res.send('Server is running and connected to the database!');
+  res.json({ message: 'Backend is live and connected!' });
 });
 
+// Start server
 app.listen(port, () => {
-  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${port}`);
+  console.log(`🔥 Server running on port ${port}`);
 });
