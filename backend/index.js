@@ -3,27 +3,30 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db.js');
 
-// Load env vars
+// Load environment variables
 dotenv.config();
 
-// Connect to database
+// Connect to MongoDB
 connectDB();
 
 const app = express();
 
-// IMPORTANT FOR RENDER: must use EXACT PORT from environment, no fallback.
+// Render requires EXACTLY this:
+// Do NOT use fallback like "|| 3001"
 const port = process.env.PORT;
 
-// CORS
+// Avoid CORS issues
 app.use(cors({
   origin: '*',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   allowedHeaders: 'Content-Type,Authorization',
 }));
+app.options('*', cors());
 
-app.use(express.json()); // body parser
+// Body parser
+app.use(express.json());
 
-// ROUTES
+// Routes
 app.use('/api/products', require('./routes/products.js'));
 app.use('/api/orders', require('./routes/orders.js'));
 app.use('/api/users', require('./routes/users.js'));
@@ -36,12 +39,12 @@ app.use('/api/shipping', require('./routes/shipping.js'));
 app.use('/api/occasions', require('./routes/occasions.js'));
 app.use('/api/papertypes', require('./routes/paperTypes.js'));
 
-// HEALTH CHECK
+// Health check
 app.get('/', (req, res) => {
-  res.send('Server is running and connected to the database!');
+  res.send('Backend is running');
 });
 
-// START SERVER
+// Start server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
