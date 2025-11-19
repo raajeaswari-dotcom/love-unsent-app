@@ -3,19 +3,18 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db.js');
 
-// Load environment variables
+// Load env vars
 dotenv.config();
 
-// Connect to MongoDB
+// Connect to database
 connectDB();
 
 const app = express();
 
-// Render requires EXACTLY this:
-// Do NOT use fallback like "|| 3001"
+// IMPORTANT for Render – MUST USE process.env.PORT ONLY
 const port = process.env.PORT;
 
-// Avoid CORS issues
+// CORS config
 app.use(cors({
   origin: '*',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -26,7 +25,7 @@ app.options('*', cors());
 // Body parser
 app.use(express.json());
 
-// Routes
+// Import routes
 app.use('/api/products', require('./routes/products.js'));
 app.use('/api/orders', require('./routes/orders.js'));
 app.use('/api/users', require('./routes/users.js'));
@@ -41,7 +40,7 @@ app.use('/api/papertypes', require('./routes/paperTypes.js'));
 
 // Health check
 app.get('/', (req, res) => {
-  res.send('Backend is running');
+  res.send('Server is running!');
 });
 
 // Start server
