@@ -1,0 +1,7 @@
+{
+  "redirects": [
+    { "source": "/admin-login", "destination": "/", "type": 200 },
+    { "source": "/admin-dashboard", "destination": "/", "type": 200 },
+    { "source": "/*", "destination": "/", "type": 200 }
+  ]
+}
