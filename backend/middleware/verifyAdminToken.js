@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const Admin = require('../models/AdminModel.js');
+const Admin = require('../models/AdminModel');
 
 const verifyAdminToken = async (req, res, next) => {
   let token;
@@ -16,9 +16,7 @@ const verifyAdminToken = async (req, res, next) => {
       req.user = await Admin.findById(decoded.id).select('-password');
 
       if (!req.user) {
-        return res
-          .status(401)
-          .json({ message: 'Not authorized, admin not found' });
+        return res.status(401).json({ message: 'Not authorized, admin not found' });
       }
 
       return next();
