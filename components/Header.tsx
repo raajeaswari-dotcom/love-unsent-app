@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect, useRef } from 'react';
 import type { User } from '../App';
 import { UserIcon, EnvelopeIcon } from './Icons';
@@ -38,44 +40,27 @@ const Header: React.FC<HeaderProps> = ({ page, anchor, navigate, cartCount, isAu
 
   return (
     <header className="bg-[#F5EADF] sticky top-0 z-50 shadow-[0_4px_12px_rgba(91,44,35,0.08)]">
-      <div className="container mx-auto px-6 relative h-32">
-
-        {/* ⭐ FIXED ADMIN LOGO CLICK — NO REDIRECT TO HOME */}
+      <div 
+        className="container mx-auto px-6 relative h-32"
+      >
         <a
           href="#"
           onClick={(e) => {
             e.preventDefault();
-
-            // If admin clicks logo → go to admin-dashboard, NOT home
-            if (user?.isAdmin) {
-              navigate('admin-dashboard');
-              return;
-            }
-
-            // During admin login, disable HOME redirect entirely
-            if (page === 'admin-login' || page === 'admin-dashboard') {
-              return;
-            }
-
-            // Normal users → go home
             navigate('home');
           }}
           className="absolute top-1/2 left-1/2 -transform -translate-x-1/2 -translate-y-1/2 transition-opacity hover:opacity-80 cursor-pointer"
         >
           <Logo className="w-56" />
         </a>
-
+        
         <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 bottom-0 items-end gap-2">
           {navLinks.map(link => (
-            <a
+             <a
               key={link.id}
               href="#"
               onClick={(e) => {
                 e.preventDefault();
-
-                // Prevent navigating away from admin login flow
-                if (page === 'admin-login' && user?.isAdmin) return;
-
                 navigate(link.page, {});
               }}
               className={`text-sm uppercase tracking-wider transition-all duration-300 px-5 rounded-t-xl ${
@@ -100,14 +85,12 @@ const Header: React.FC<HeaderProps> = ({ page, anchor, navigate, cartCount, isAu
                 <UserIcon />
               </a>
             )}
-
             {isDropdownOpen && isAuthenticated && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-1 z-50">
                 <div className="px-4 py-2 text-sm text-gray-700 border-b">
                   <p className="font-bold truncate">{user?.name}</p>
                   <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                 </div>
-
                 <a
                   href="#"
                   onClick={(e) => { e.preventDefault(); navigate('profile'); setIsDropdownOpen(false); }}
@@ -115,9 +98,8 @@ const Header: React.FC<HeaderProps> = ({ page, anchor, navigate, cartCount, isAu
                 >
                   My Profile
                 </a>
-
                 {user?.isAdmin && (
-                  <a
+                   <a
                     href="#"
                     onClick={(e) => { e.preventDefault(); navigate('admin-dashboard'); setIsDropdownOpen(false); }}
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -125,7 +107,6 @@ const Header: React.FC<HeaderProps> = ({ page, anchor, navigate, cartCount, isAu
                     Admin
                   </a>
                 )}
-
                 <button
                   onClick={() => { onLogout(); setIsDropdownOpen(false); }}
                   className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -135,7 +116,6 @@ const Header: React.FC<HeaderProps> = ({ page, anchor, navigate, cartCount, isAu
               </div>
             )}
           </div>
-
           <a 
             href="#" 
             onClick={(e) => { e.preventDefault(); navigate('cart'); }}

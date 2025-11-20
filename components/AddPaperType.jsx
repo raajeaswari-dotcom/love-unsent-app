@@ -33,7 +33,7 @@ const AddPaperType = ({ onClose, onAdd }) => {
         const formData = new FormData();
         formData.append('image', selectedFile);
 
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem('adminToken');
 
         try {
             const response = await fetch('https://love-unsent-app-final-backend.onrender.com/api/paper-types/upload', {
@@ -45,17 +45,15 @@ const AddPaperType = ({ onClose, onAdd }) => {
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Image upload failed');
+                throw new Error('Image upload failed');
             }
 
             const data = await response.json();
             setUploadedImageUrl(data.url);
-            alert("Image uploaded successfully! You can now save the paper type.");
 
         } catch (err) {
             console.error(err);
-            setError(err.message || "Image upload failed. Please try again.");
+            setError("Image upload failed. Please try again.");
         } finally {
             setIsUploading(false);
         }
@@ -65,18 +63,14 @@ const AddPaperType = ({ onClose, onAdd }) => {
         e.preventDefault();
         setError("");
 
-        if (!name.trim() || !description.trim()) {
-            setError("Name and description are required.");
-            return;
-        }
-
         if (!uploadedImageUrl) {
-            setError("Please upload an image before saving.");
+            setError("Please upload an image first.");
+            alert("Please upload an image first.");
             return;
         }
 
         setIsLoading(true);
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem('adminToken');
 
         try {
             const response = await fetch('https://love-unsent-app-final-backend.onrender.com/api/paper-types', {
@@ -88,7 +82,7 @@ const AddPaperType = ({ onClose, onAdd }) => {
                 body: JSON.stringify({
                     name,
                     description,
-                    image: uploadedImageUrl, // Backend expects 'image'
+                    imageUrl: uploadedImageUrl,
                 }),
             });
 
@@ -97,7 +91,8 @@ const AddPaperType = ({ onClose, onAdd }) => {
                 throw new Error(errorData.message || 'Failed to save paper type');
             }
 
-            onAdd(); // Notify parent to refresh
+            // In a real app, you'd likely call a prop to refresh the list,
+            // but we will just close as per the requirements.
             onClose();
 
         } catch (err) {
@@ -110,11 +105,11 @@ const AddPaperType = ({ onClose, onAdd }) => {
 
     return (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg p-6 w-full max-w-lg relative text-gray-800 shadow-xl">
-                <h2 className="text-xl font-bold mb-4">Add New Paper Type</h2>
+            <div className="bg-[#F5EADF] rounded-2xl p-8 w-full max-w-lg relative text-[#5B2C23] shadow-2xl">
+                <h2 className="text-2xl font-bold mb-6">Add New Paper Type</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label htmlFor="name" className="font-semibold block mb-1 text-sm">Name</label>
+                        <label htmlFor="name" className="font-semibold block mb-1">Name</label>
                         <input
                             id="name"
                             type="text"
@@ -122,11 +117,11 @@ const AddPaperType = ({ onClose, onAdd }) => {
                             onChange={(e) => setName(e.target.value)}
                             placeholder="e.g., Cotton Rag Paper"
                             required
-                            className="w-full bg-gray-50 border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full bg-white/60 border border-[#8C6653] rounded-xl py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#5B2C23]"
                         />
                     </div>
                     <div>
-                        <label htmlFor="description" className="font-semibold block mb-1 text-sm">Description</label>
+                        <label htmlFor="description" className="font-semibold block mb-1">Description</label>
                         <textarea
                             id="description"
                             value={description}
@@ -134,17 +129,17 @@ const AddPaperType = ({ onClose, onAdd }) => {
                             rows={3}
                             placeholder="A short description of the paper type..."
                             required
-                            className="w-full bg-gray-50 border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full bg-white/60 border border-[#8C6653] rounded-xl py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#5B2C23]"
                         />
                     </div>
                     <div>
-                        <label className="font-semibold block mb-1 text-sm">Image</label>
+                        <label className="font-semibold block mb-1">Image</label>
                         <div className="flex items-start gap-4">
-                            <div className="w-28 h-28 bg-gray-100 border-2 border-dashed border-gray-300 rounded-md flex items-center justify-center">
+                            <div className="w-32 h-32 bg-white/50 border-2 border-dashed border-[#8C6653] rounded-xl flex items-center justify-center">
                                 {previewUrl ? (
-                                    <img src={previewUrl} alt="Preview" className="w-full h-full object-cover rounded-md" />
+                                    <img src={previewUrl} alt="Preview" className="w-full h-full object-cover rounded-lg" />
                                 ) : (
-                                    <span className="text-xs text-center text-gray-500">Preview</span>
+                                    <span className="text-xs text-center text-[#8C6653]">Image Preview</span>
                                 )}
                             </div>
                             <div className="flex-1">
@@ -155,16 +150,16 @@ const AddPaperType = ({ onClose, onAdd }) => {
                                     onChange={handleFileChange}
                                     accept="image/png, image/jpeg, image/webp"
                                 />
-                                <label htmlFor="imageUpload" className="cursor-pointer bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded-md hover:bg-gray-300 transition-colors inline-block text-sm">
+                                <label htmlFor="imageUpload" className="cursor-pointer bg-[#E9CBA7] text-[#5B2C23] font-bold py-2 px-4 rounded-xl hover:bg-opacity-80 transition-colors inline-block">
                                     Choose File
                                 </label>
-                                {selectedFile && <p className="text-xs mt-2 text-gray-500 truncate">{selectedFile.name}</p>}
+                                {selectedFile && <p className="text-xs mt-2 text-[#8C6653] truncate">{selectedFile.name}</p>}
 
                                 <button
                                     type="button"
                                     onClick={handleImageUpload}
                                     disabled={!selectedFile || isUploading || uploadedImageUrl}
-                                    className="mt-2 bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700 transition-all disabled:bg-blue-300 disabled:cursor-not-allowed w-full text-sm"
+                                    className="mt-2 bg-[#8C6653] text-white font-bold py-2 px-4 rounded-xl hover:bg-opacity-90 transition-all disabled:bg-opacity-50 disabled:cursor-not-allowed w-full"
                                 >
                                     {isUploading ? "Uploading..." : (uploadedImageUrl ? "Uploaded ✓" : "Upload Image")}
                                 </button>
@@ -172,13 +167,13 @@ const AddPaperType = ({ onClose, onAdd }) => {
                         </div>
                     </div>
 
-                    {error && <p className="text-red-600 font-semibold text-sm text-center">{error}</p>}
+                    {error && <p className="text-red-600 font-bold text-sm text-center">{error}</p>}
 
-                    <div className="flex justify-end gap-4 pt-4 border-t border-gray-200">
-                        <button type="button" onClick={onClose} className="bg-gray-200 font-bold py-2 px-5 rounded-md text-gray-700 hover:bg-gray-300 transition-colors">
+                    <div className="flex justify-end gap-4 pt-4 border-t border-[#E9CBA7]">
+                        <button type="button" onClick={onClose} className="bg-gray-300 font-bold py-2 px-6 rounded-xl text-[#5B2C23] hover:bg-gray-400 transition-colors">
                             Cancel
                         </button>
-                        <button type="submit" disabled={isLoading || isUploading} className="bg-green-600 text-white font-bold py-2 px-5 rounded-md hover:bg-green-700 transition-colors disabled:bg-green-300">
+                        <button type="submit" disabled={isLoading} className="bg-[#5B2C23] text-white font-bold py-2 px-6 rounded-xl hover:bg-opacity-90 transition-colors disabled:bg-opacity-70">
                             {isLoading ? "Saving..." : "Save"}
                         </button>
                     </div>

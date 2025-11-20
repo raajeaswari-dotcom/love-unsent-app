@@ -1,45 +1,63 @@
+
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db.js');
 
+// Load env vars
 dotenv.config();
 
-// Connect to MongoDB
+// Connect to database
 connectDB();
 
 const app = express();
+const port = process.env.PORT || 3001;
 
-// Render MUST control the port
-const port = process.env.PORT;
+// Import routes
+const productsRoutes = require('./routes/products.js');
+const ordersRoutes = require('./routes/orders.js');
+const usersRoutes = require('./routes/users.js');
+const paymentsRoutes = require('./routes/payments.js');
+const couponsRoutes = require('./routes/coupons.js');
+const writersRoutes = require('./routes/writers.js');
+const testimonialsRoutes = require('./routes/testimonials.js');
+const adminRoutes = require('./routes/adminRoutes.js');
+const shippingRoutes = require('./routes/shipping.js');
+const occasionsRoutes = require('./routes/occasions.js');
+const paperTypesRoutes = require('./routes/paperTypes.js');
 
-// CORS setup
-app.use(cors({
+const corsOptions = {
   origin: '*',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  allowedHeaders: 'Content-Type,Authorization'
-}));
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+  allowedHeaders: 'Content-Type,Authorization',
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 app.use(express.json());
 
-// Routes
-app.use('/api/products', require('./routes/products.js'));
-app.use('/api/orders', require('./routes/orders.js'));
-app.use('/api/users', require('./routes/users.js'));
-app.use('/api/payments', require('./routes/payments.js'));
-app.use('/api/coupons', require('./routes/coupons.js'));
-app.use('/api/writers', require('./routes/writers.js'));
-app.use('/api/testimonials', require('./routes/testimonials.js'));
-app.use('/api/admin', require('./routes/adminRoutes.js'));
-app.use('/api/shipping', require('./routes/shipping.js'));
-app.use('/api/occasions', require('./routes/occasions.js'));
-app.use('/api/papertypes', require('./routes/paperTypes.js'));
+// Mount routers
+app.use('/api/products', productsRoutes);
+app.use('/api/orders', ordersRoutes);
+app.use('/api/users', usersRoutes);
+app.use('/api/payments', paymentsRoutes);
+app.use('/api/coupons', couponsRoutes);
+app.use('/api/writers', writersRoutes);
+app.use('/api/testimonials', testimonialsRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/shipping', shippingRoutes);
+app.use('/api/occasions', occasionsRoutes);
+app.use('/api/papertypes', paperTypesRoutes);
 
-// Health check
+
+// A simple health check endpoint
 app.get('/', (req, res) => {
-  res.send('Backend OK: Connected to database');
+  res.send('Server is running and connected to the database!');
 });
 
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${port}`);
 });
