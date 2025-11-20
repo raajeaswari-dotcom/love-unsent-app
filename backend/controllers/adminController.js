@@ -11,9 +11,7 @@ const PaperType = require('../models/PaperTypeModel.js');
 // Mock DB
 const db = require('../models/index.js');
 
-// -------------------------
 // LOGIN ADMIN
-// -------------------------
 const loginAdmin = async (req, res) => {
   const { email, password } = req.body;
 
@@ -40,9 +38,7 @@ const loginAdmin = async (req, res) => {
   }
 };
 
-// -------------------------
 // DASHBOARD DATA
-// -------------------------
 const getDashboardData = async (req, res) => {
   try {
     const products = await Product.find({});
